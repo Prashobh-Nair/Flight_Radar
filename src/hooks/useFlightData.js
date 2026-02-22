@@ -10,11 +10,9 @@ export const REGIONS = {
 };
 
 // AirLabs API Configuration
-const API_KEY = '02f0e69e-ebf7-4c3b-bd30-101a94d800d3';
 const TRAIL_LENGTH = 10;
 
 // India bounding box for AirLabs
-const INDIA_BBOX = '6.5,68.0,35.7,97.5';
 
 export default function useFlightData(region = 'india') {
     const [flights, setFlights] = useState([]);
@@ -27,13 +25,11 @@ export default function useFlightData(region = 'india') {
     const fetchFlights = useCallback(async () => {
         try {
             setLoading(true);
-            const targetUrl = `https://airlabs.co/api/v9/flights?api_key=${API_KEY}&bbox=${INDIA_BBOX}`;
 
             // Try a different, more robust CORS proxy
             // corsproxy.io is often better than allorigins for large JSON responses
-            const proxiedUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
-            const resp = await fetch(proxiedUrl);
+            const resp = await fetch("https://flight-radar-ten.vercel.app/api/flights");
 
             if (!resp.ok) {
                 throw new Error(`Proxy error: ${resp.status} - ${resp.statusText}`);
