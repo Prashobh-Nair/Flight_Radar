@@ -38,9 +38,6 @@ export default function useFlightData(region = 'india') {
             const data = await resp.json();
 
             // AirLabs specific: error message can be inside the JSON
-            if (data.error) {
-                throw new Error(`AirLabs API Error: ${data.error.message || 'Unknown error'}`);
-            }
 
             const rawAc = data.response || []; // AirLabs uses 'response' field
 
