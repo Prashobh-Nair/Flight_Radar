@@ -29,7 +29,7 @@ export default function useFlightData(region = 'india') {
             // Try a different, more robust CORS proxy
             // corsproxy.io is often better than allorigins for large JSON responses
 
-            const resp = await fetch("https://flight-radar-ten.vercel.app/api/flights");
+            const resp = await fetch("/api/flights");
 
             if (!resp.ok) {
                 throw new Error(`Proxy error: ${resp.status} - ${resp.statusText}`);
