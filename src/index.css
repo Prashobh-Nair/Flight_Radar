@@ -1,0 +1,761 @@
+/* ─── Import Fonts ──────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ─── CSS Variables — Professional Light Theme ─────────────────────────── */
+:root {
+  --bg-primary: #f4f7fb;
+  --bg-secondary: #eaf0f8;
+  --bg-tertiary: #dce8f5;
+
+  --surface: #ffffff;
+  --surface-hover: #f0f6ff;
+  --glass: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(30, 90, 160, 0.12);
+  --glass-hover: rgba(255, 255, 255, 0.95);
+
+  --text-primary: #0d1e34;
+  --text-secondary: #2c5282;
+  --text-muted: #7a99bb;
+  --text-accent: #1565c0;
+
+  --accent-blue: #1565c0;
+  --accent-sky: #0288d1;
+  --accent-teal: #00838f;
+  --accent-orange: #e65100;
+  --accent-red: #c62828;
+  --accent-green: #2e7d32;
+  --accent-amber: #f57f17;
+
+  --gradient-bg: linear-gradient(160deg, #e8f4fd 0%, #f4f7fb 60%, #edf3fb 100%);
+  --gradient-nav: linear-gradient(90deg, #0d47a1 0%, #1565c0 100%);
+  --gradient-accent: linear-gradient(135deg, #1565c0 0%, #0288d1 100%);
+  --gradient-card: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 248, 255, 0.8));
+
+  --shadow-xs: 0 1px 3px rgba(0, 60, 140, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 60, 140, 0.10);
+  --shadow-md: 0 6px 24px rgba(0, 60, 140, 0.12);
+  --shadow-lg: 0 16px 48px rgba(0, 60, 140, 0.15);
+  --shadow-glow: 0 0 0 3px rgba(21, 101, 192, 0.18);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --transition-fast: 120ms ease;
+  --transition-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  --navbar-height: 58px;
+  --sidebar-width: 320px;
+}
+
+/* ─── Reset ─────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--gradient-bg);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e8f0fb;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #90b8e0;
+  border-radius: 3px;
+}
+
+/* ─── Navbar ─────────────────────────────────────────────────────────────── */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--navbar-height);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--gradient-nav);
+  box-shadow: 0 2px 12px rgba(0, 40, 120, 0.2);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-icon {
+  font-size: 24px;
+  animation: soar 3s ease-in-out infinite;
+  display: inline-block;
+  filter: brightness(1.2);
+}
+
+@keyframes soar {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-3px) rotate(4deg);
+  }
+}
+
+.brand-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 1.5px;
+}
+
+.brand-subtitle {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.navbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #69f0ae;
+  border-radius: 50%;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: default;
+}
+
+/* ─── App Layout ─────────────────────────────────────────────────────────── */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: var(--navbar-height);
+}
+
+.main-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ─── Map ────────────────────────────────────────────────────────────────── */
+.map-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Slightly cooled map tiles for a professional look */
+.leaflet-tile-pane {
+  filter: saturate(0.85) brightness(1.0);
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-left: 1px solid var(--glass-border);
+  box-shadow: -4px 0 18px rgba(0, 60, 140, 0.06);
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: var(--bg-tertiary);
+  margin: 2px 0;
+}
+
+/* ─── Section Label ──────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* ─── Search Bar ─────────────────────────────────────────────────────────── */
+.search-wrapper {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 9px 14px 9px 38px;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-glow);
+  background: #fff;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px;
+  transition: color var(--transition-fast);
+}
+
+.search-clear:hover {
+  color: var(--accent-red);
+}
+
+/* ─── Region Select ──────────────────────────────────────────────────────── */
+.region-select {
+  width: 100%;
+  padding: 9px 34px 9px 14px;
+  background: var(--bg-primary);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237a99bb' d='M1 3l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: all var(--transition-fast);
+}
+
+.region-select:focus {
+  border-color: var(--accent-blue);
+  box-shadow: var(--shadow-glow);
+  background-color: #fff;
+}
+
+.region-select option {
+  background: #fff;
+  color: var(--text-primary);
+}
+
+/* ─── Stats Grid ─────────────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+
+.stat-card {
+  padding: 11px 12px;
+  background: var(--gradient-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-base);
+  cursor: default;
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-sm), var(--shadow-glow);
+  transform: translateY(-2px);
+  border-color: rgba(21, 101, 192, 0.25);
+}
+
+.stat-icon {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.stat-value {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  line-height: 1;
+  transition: all var(--transition-base);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin-top: 2px;
+}
+
+/* ─── Country List ───────────────────────────────────────────────────────── */
+.country-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.country-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 9px;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-size: 12px;
+  transition: all var(--transition-fast);
+}
+
+.country-item:hover {
+  background: var(--bg-secondary);
+  border-color: var(--glass-border);
+}
+
+.country-name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.country-count {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-blue);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.country-bar {
+  width: 100%;
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 999px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+
+.country-bar-fill {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 999px;
+  transition: width 0.6s ease;
+}
+
+/* ─── Leaflet tooltip ────────────────────────────────────────────────────── */
+.leaflet-tooltip {
+  background: #fff !important;
+  border: 1px solid rgba(21, 101, 192, 0.2) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--text-primary) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 11px !important;
+  padding: 4px 9px !important;
+  box-shadow: var(--shadow-sm) !important;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip::before {
+  border-top-color: rgba(21, 101, 192, 0.2) !important;
+}
+
+/* ─── Flight Info Panel ──────────────────────────────────────────────────── */
+.flight-info-panel {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+  width: min(540px, calc(100vw - 40px));
+  animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.flight-info-card {
+  padding: 18px 22px;
+  background: #ffffff;
+  border: 1px solid rgba(21, 101, 192, 0.15);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+}
+
+.flight-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.flight-callsign {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--accent-blue);
+  letter-spacing: 2px;
+}
+
+.flight-country-badge {
+  padding: 3px 11px;
+  background: rgba(21, 101, 192, 0.08);
+  border: 1px solid rgba(21, 101, 192, 0.2);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-left: 10px;
+}
+
+.close-btn {
+  background: #f4f7fb;
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 18px;
+  line-height: 1;
+  transition: all var(--transition-fast);
+}
+
+.close-btn:hover {
+  background: #ffebee;
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  transform: rotate(90deg);
+}
+
+.flight-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+
+.info-item {
+  padding: 9px 11px;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+}
+
+.info-item-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.info-item-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.info-item-value.highlight {
+  color: var(--accent-blue);
+  font-weight: 700;
+}
+
+/* ─── Loader ─────────────────────────────────────────────────────────────── */
+.loader-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(244, 247, 251, 0.85);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  gap: 14px;
+}
+
+.loader-rings {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-ring {
+  width: 52px;
+  height: 52px;
+  border: 3px solid #d0e4f7;
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+.loader-ring-2 {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #d0e4f7;
+  border-bottom-color: var(--accent-sky);
+  border-radius: 50%;
+  animation: spin 1.3s linear infinite reverse;
+  position: absolute;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loader-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent-blue);
+}
+
+.loader-subtext {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ─── Update Timer ───────────────────────────────────────────────────────── */
+.update-timer {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+}
+
+.timer-progress {
+  width: 55px;
+  height: 4px;
+  background: #d0e4f7;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.timer-bar {
+  height: 100%;
+  background: var(--gradient-accent);
+  border-radius: 999px;
+  transition: width linear;
+}
+
+/* ─── Error Banner ───────────────────────────────────────────────────────── */
+.error-banner {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1500;
+  padding: 9px 18px;
+  background: #fff3f3;
+  border: 1px solid rgba(198, 40, 40, 0.3);
+  border-radius: 999px;
+  color: var(--accent-red);
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  :root {
+    --sidebar-width: 270px;
+  }
+
+  .flight-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
+    max-height: 38vh;
+    border-left: none;
+    border-top: 1px solid var(--glass-border);
+    z-index: 700;
+    padding: 10px 12px;
+  }
+
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .flight-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+}
