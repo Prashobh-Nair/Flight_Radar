@@ -26,8 +26,7 @@ export default function useFlightData(region = 'india') {
         try {
             setLoading(true);
 
-            // Try a different, more robust CORS proxy
-            // corsproxy.io is often better than allorigins for large JSON responses
+        
 
             const resp = await fetch("/api/flights");
 
