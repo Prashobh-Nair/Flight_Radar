@@ -14,7 +14,7 @@ export default function App() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const { flights, loading, error, lastUpdate, stats } = useFlightData(region);
+  const { flights, loading, error, lastUpdate, stats, refresh } = useFlightData(region);
 
   const handleRegionChange = useCallback((r) => {
     setRegion(r);
@@ -40,20 +40,22 @@ export default function App() {
     <div className="app-container">
       <Navbar
         flightCount={flights.length}
+        onRefresh={refresh}
+        loading={loading}
       />
 
       <div className="main-layout">
         {/* Map area */}
         <div style={{ position: 'relative', flex: 1, overflow: 'hidden', height: '100%' }}>
-          {loading && <Loader />}
+          {loading && flights.length === 0 && <Loader />}
 
-          {error && (
+          {error && flights.length === 0 && (
             <div className="error-banner">
               <span>⚠️</span>
               {error.includes('401') || error.includes('403')
                 ? 'Authentication error — check API credentials'
                 : error.includes('429')
-                  ? 'Rate limit reached — retrying in 20s'
+                  ? 'Rate limit reached — retrying in 15s'
                   : error}
             </div>
           )}
@@ -62,6 +64,7 @@ export default function App() {
             flights={filteredFlights}
             selectedFlight={selected}
             onSelectFlight={handleSelectFlight}
+            region={region}
           />
 
           {selected && (

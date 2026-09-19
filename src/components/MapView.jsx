@@ -5,6 +5,14 @@ import 'leaflet/dist/leaflet.css';
 
 delete L.Icon.Default.prototype._getIconUrl;
 
+const REGION_CENTERS = {
+    india: { center: [22, 82], zoom: 5, label: 'India Airspace' },
+    world: { center: [20, 0], zoom: 2, label: 'Global Airspace' },
+    asia: { center: [34, 100], zoom: 4, label: 'Asia Airspace' },
+    europe: { center: [50, 15], zoom: 4, label: 'Europe Airspace' },
+    north_america: { center: [40, -98], zoom: 4, label: 'North America Airspace' },
+};
+
 // ── Professional plane icon — navy blue body, gold outline ──────────────────
 function makeIcon(heading, selected) {
     const sz = selected ? 36 : 26;
@@ -34,6 +42,28 @@ function makeIcon(heading, selected) {
         iconSize: [sz, sz],
         iconAnchor: [sz / 2, sz / 2],
     });
+}
+
+// ── Controller for smooth map panning on region/flight change ────────────────
+function MapController({ region, selectedFlight }) {
+    const map = useMap();
+    const prevRegionRef = useRef(region);
+
+    useEffect(() => {
+        if (prevRegionRef.current !== region) {
+            prevRegionRef.current = region;
+            const target = REGION_CENTERS[region] || REGION_CENTERS.india;
+            map.flyTo(target.center, target.zoom, { duration: 1.2 });
+        }
+    }, [region, map]);
+
+    useEffect(() => {
+        if (selectedFlight?.latitude != null && selectedFlight?.longitude != null) {
+            map.panTo([selectedFlight.latitude, selectedFlight.longitude], { animate: true, duration: 0.8 });
+        }
+    }, [selectedFlight, map]);
+
+    return null;
 }
 
 // ── Aircraft layer ─────────────────────────────────────────────────────────
@@ -109,7 +139,9 @@ function AircraftLayer({ flights, selectedIcao, onSelect }) {
 }
 
 // ── MapView ────────────────────────────────────────────────────────────────
-export default function MapView({ flights, selectedFlight, onSelectFlight }) {
+export default function MapView({ flights, selectedFlight, onSelectFlight, region = 'india' }) {
+    const regionInfo = REGION_CENTERS[region] || REGION_CENTERS.india;
+
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
 
@@ -125,14 +157,14 @@ export default function MapView({ flights, selectedFlight, onSelectFlight }) {
                 backdropFilter: 'blur(6px)',
             }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#43a047', boxShadow: '0 0 0 2px #a5d6a7' }} />
-                ✈ {flights.length} aircraft · India Airspace
+                ✈ {flights.length} aircraft · {regionInfo.label}
             </div>
 
-            {/* Google Maps */}
+            {/* Google Maps Tiles */}
             <MapContainer
-                center={[22, 82]}
-                zoom={5}
-                minZoom={4}
+                center={regionInfo.center}
+                zoom={regionInfo.zoom}
+                minZoom={2}
                 maxZoom={18}
                 style={{ width: '100%', height: '100%' }}
                 zoomControl={true}
@@ -144,6 +176,8 @@ export default function MapView({ flights, selectedFlight, onSelectFlight }) {
                     attribution="&copy; Google Maps"
                     maxZoom={20}
                 />
+
+                <MapController region={region} selectedFlight={selectedFlight} />
 
                 <AircraftLayer
                     flights={flights}

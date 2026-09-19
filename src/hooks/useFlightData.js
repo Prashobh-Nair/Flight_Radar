@@ -9,10 +9,8 @@ export const REGIONS = {
     north_america: { label: '🌎 North America', bbox: { lamin: 15, lomin: -130, lamax: 72, lomax: -52 } },
 };
 
-// AirLabs API Configuration
 const TRAIL_LENGTH = 10;
-
-// India bounding box for AirLabs
+const POLL_INTERVAL = 15000; // 15 seconds
 
 export default function useFlightData(region = 'india') {
     const [flights, setFlights] = useState([]);
@@ -22,29 +20,61 @@ export default function useFlightData(region = 'india') {
 
     const historyRef = useRef({}); // Memory of past positions: { icao: [[lat, lon], ...] }
 
-    const fetchFlights = useCallback(async () => {
+    const fetchFlights = useCallback(async (isPolling = false) => {
         try {
-            setLoading(true);
+            if (!isPolling) {
+                setLoading(true);
+            }
 
-        
+            const bbox = REGIONS[region]?.bbox;
+            let query = '';
+            if (bbox) {
+                query = `?lamin=${bbox.lamin}&lomin=${bbox.lomin}&lamax=${bbox.lamax}&lomax=${bbox.lomax}`;
+            }
 
-            const resp = await fetch("/api/flights");
+            const resp = await fetch(`/api/flights${query}`);
 
             if (!resp.ok) {
-                throw new Error(`Proxy error: ${resp.status} - ${resp.statusText}`);
+                throw new Error(`Flight service error (${resp.status}): ${resp.statusText}`);
             }
 
             const data = await resp.json();
 
-            // AirLabs specific: error message can be inside the JSON
+            let rawList = [];
+            if (Array.isArray(data.response)) {
+                rawList = data.response;
+            } else if (Array.isArray(data.states)) {
+                // OpenSky raw array format
+                rawList = data.states
+                    .filter(s => s && s[5] != null && s[6] != null)
+                    .map(s => {
+                        const icao = (s[0] || '').toLowerCase().trim();
+                        const callsign = (s[1] || s[0] || 'N/A').trim();
+                        return {
+                            icao24: icao,
+                            callsign: callsign,
+                            country: s[2] || 'Unknown',
+                            longitude: s[5],
+                            latitude: s[6],
+                            altitude: Math.round(s[7] ?? s[13] ?? 0),
+                            onGround: Boolean(s[8]),
+                            velocity: Math.round((s[9] || 0) * 3.6),
+                            heading: Math.round(s[10] || 0),
+                            verticalRate: s[11] != null ? Math.round(s[11] * 10) / 10 : 0,
+                            squawk: s[14] || 'N/A'
+                        };
+                    });
+            }
 
-            const rawAc = data.response || []; // AirLabs uses 'response' field
-
-            const processed = rawAc.map(ac => {
-                const icao = (ac.hex || '').toLowerCase();
+            const processed = rawList.map(ac => {
+                const icao = (ac.icao24 || ac.hex || '').toLowerCase().trim();
                 if (!icao) return null;
 
-                const pos = [ac.lat, ac.lng];
+                const lat = Number(ac.latitude ?? ac.lat);
+                const lng = Number(ac.longitude ?? ac.lng);
+                if (isNaN(lat) || isNaN(lng)) return null;
+
+                const pos = [lat, lng];
 
                 // ── Manage Trail History ──
                 if (!historyRef.current[icao]) {
@@ -59,19 +89,23 @@ export default function useFlightData(region = 'india') {
                     if (hist.length > TRAIL_LENGTH) hist.shift();
                 }
 
+                const callsign = (ac.callsign || ac.flight_icao || ac.flight_iata || ac.hex || ac.icao24 || 'N/A').trim();
+                const country = ac.country || ac.flag || (region === 'india' ? 'India' : 'Unknown');
+
                 return {
                     icao24: icao,
-                    callsign: (ac.flight_icao || ac.flight_iata || ac.hex || 'N/A').trim(),
-                    registration: ac.reg_number || 'N/A',
-                    typeCode: ac.aircraft_icao || 'N/A',
-                    latitude: ac.lat,
-                    longitude: ac.lng,
-                    altitude: ac.alt || 0,        // AirLabs uses meters
-                    velocity: ac.speed || 0,      // AirLabs uses km/h
-                    heading: ac.dir || 0,        // AirLabs uses degrees
-                    verticalRate: ac.v_speed || 0,    // AirLabs uses m/s
-                    onGround: ac.alt != null && ac.alt < 300,
-                    country: ac.flag || 'India', // Flag is country code (e.g., "IN")
+                    callsign: callsign,
+                    registration: ac.registration || ac.reg_number || icao.toUpperCase(),
+                    typeCode: ac.typeCode || ac.aircraft_icao || 'N/A',
+                    latitude: lat,
+                    longitude: lng,
+                    altitude: Number(ac.altitude ?? ac.alt ?? 0),
+                    velocity: Number(ac.velocity ?? ac.speed ?? 0),
+                    heading: Number(ac.heading ?? ac.dir ?? 0),
+                    verticalRate: Number(ac.verticalRate ?? ac.v_speed ?? 0),
+                    onGround: Boolean(ac.onGround ?? ac.on_ground ?? false),
+                    country: country,
+                    squawk: ac.squawk || 'N/A',
                     trail: [...hist]
                 };
             }).filter(f => f !== null && f.latitude != null && f.longitude != null);
@@ -80,16 +114,25 @@ export default function useFlightData(region = 'india') {
             setError(null);
             setLastUpdate(new Date());
         } catch (err) {
-            console.error('Fetch error:', err);
+            console.error('Fetch flights error:', err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [region]);
 
-    // Fetch immediately on mount or region change - NO AUTO POLL
+    // Fetch immediately on mount or region change
     useEffect(() => {
-        fetchFlights();
+        fetchFlights(false);
+
+        // Auto polling every 15s
+        const timer = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                fetchFlights(true);
+            }
+        }, POLL_INTERVAL);
+
+        return () => clearInterval(timer);
     }, [fetchFlights, region]);
 
     // Derived stats for StatsWidget
@@ -102,11 +145,11 @@ export default function useFlightData(region = 'india') {
             ? Math.max(...flights.map(f => f.velocity || 0))
             : 0,
         byCountry: flights.reduce((acc, f) => {
-            const c = f.country === 'IN' ? 'India' : f.country;
+            const c = f.country === 'IN' ? 'India' : (f.country || 'Unknown');
             acc[c] = (acc[c] || 0) + 1;
             return acc;
         }, {})
     };
 
-    return { flights, loading, error, lastUpdate, stats, refresh: fetchFlights };
+    return { flights, loading, error, lastUpdate, stats, refresh: () => fetchFlights(false) };
 }
